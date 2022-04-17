@@ -1,13 +1,16 @@
 package database
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type IDataBase interface {
+	Connect()
 	GetConnection() *gorm.DB
 }
 
 type DataBase struct {
-	DB *gorm.DB
+	*gorm.DB
 }
 
 func (db *DataBase) GetConnection() *gorm.DB {

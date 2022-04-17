@@ -7,17 +7,24 @@ import (
 	"github.com/CesarDelgadoM/register-API/databases/postgres"
 )
 
+var psql *postgres.Postgres
+
 func SelectDB(namedb string) database.IDataBase {
-	var idb database.IDataBase
 	switch namedb {
 	case "postgres":
-		idb = postgres.GetDB()
+		return psql
 	default:
 		log.Println("name database not exist: ", namedb)
+		return nil
 	}
-	return idb
 }
 
 func ConnectDB(namedb string) {
-
+	switch namedb {
+	case "postgres":
+		psql = postgres.New()
+		psql.Connect()
+	default:
+		log.Println("name database not exist: ", namedb)
+	}
 }

@@ -4,8 +4,9 @@ import "time"
 
 type Register struct {
 	RegId       uint32    `gorm:"primary_key;auto_increment" json:"reg_id"`
-	RegNames    string    `gorm:"size:25" json:"reg_names"`
+	RegName     string    `gorm:"size:30" json:"reg_name"`
+	RegCompany  string    `gorm:"size:30" json:"reg_company"`
 	RegCheckIn  time.Time `json:"reg_check_in"`
 	RegCheckOut time.Time `json:"reg_check_out"`
-	Objects     []Objects `json:"foreignKey:ObjIdUser;references:RegId"`
+	Objects     []Object  `gorm:"foreignKey:ObjRegId;references:RegId" json:"reg_objects_id"`
 }
