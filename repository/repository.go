@@ -35,7 +35,7 @@ func (repo *Repository[T]) SaveAll(model *[]T) (*[]T, error) {
 
 func (repo *Repository[T]) GetAll() (*[]T, error) {
 	var model *[]T
-	err := repo.connection.Debug().Model(&model).Limit(100).Find(model).Error
+	err := repo.connection.Debug().Model(&model).Limit(100).Find(&model).Error
 	if err != nil {
 		return nil, err
 	}

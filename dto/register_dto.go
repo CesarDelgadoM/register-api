@@ -7,6 +7,7 @@ import (
 )
 
 type RegisterDTO struct {
+	RegId       uint32      `json:"reg_id"`
 	RegName     string      `json:"reg_name"`
 	RegCompany  string      `json:"reg_company"`
 	RegCheckIn  time.Time   `json:"reg_check_in"`
@@ -23,6 +24,7 @@ func ModeltoDto(model *models.Register) *RegisterDTO {
 		}
 	}
 	return &RegisterDTO{
+		RegId:       model.RegId,
 		RegName:     model.RegName,
 		RegCompany:  model.RegCompany,
 		RegCheckIn:  model.RegCheckIn,

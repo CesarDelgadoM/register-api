@@ -23,6 +23,8 @@ func (controller *Controller) GetRouter() *mux.Router {
 }
 
 func (controller *Controller) RoutesRegister() {
+	controller.router.HandleFunc("/register/getall",
+		middleware.SetMiddlewareJson(controller.registerServ.GetAllRegisters)).Methods("GET")
 	controller.router.HandleFunc("/register/get/{id}",
 		middleware.SetMiddlewareJson(controller.registerServ.GetRegister)).Methods("GET")
 	controller.router.HandleFunc("/register/save",
