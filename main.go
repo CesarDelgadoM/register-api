@@ -12,7 +12,7 @@ func main() {
 	if err != nil {
 		log.Fatal("Cannot load file .env")
 	}
-	server := server.New()
+	server := server.NewServer()
 	server.Initialize()
-	server.Run("8080")
+	server.Run("8081")
 }

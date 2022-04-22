@@ -8,5 +8,5 @@ type Register struct {
 	RegCompany  string    `gorm:"size:30" json:"reg_company"`
 	RegCheckIn  time.Time `json:"reg_check_in"`
 	RegCheckOut time.Time `json:"reg_check_out"`
-	Objects     []Object  `gorm:"foreignKey:ObjRegId;references:RegId" json:"reg_objects_id"`
+	Objects     []Object  `gorm:"foreignKey:ObjRegId;references:RegId;constraint:OnDelete:CASCADE" json:"reg_objects_id"`
 }

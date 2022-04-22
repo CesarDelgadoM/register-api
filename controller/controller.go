@@ -7,14 +7,14 @@ import (
 )
 
 type Controller struct {
-	service *services.RegisterService
-	router  *mux.Router
+	registerServ *services.RegisterService
+	router       *mux.Router
 }
 
-func New() *Controller {
+func NewController() *Controller {
 	return &Controller{
-		service: services.New(),
-		router:  mux.NewRouter(),
+		registerServ: services.NewRegisterService(),
+		router:       mux.NewRouter(),
 	}
 }
 
@@ -23,8 +23,14 @@ func (controller *Controller) GetRouter() *mux.Router {
 }
 
 func (controller *Controller) RoutesRegister() {
+	controller.router.HandleFunc("/register/get/{id}",
+		middleware.SetMiddlewareJson(controller.registerServ.GetRegister)).Methods("GET")
 	controller.router.HandleFunc("/register/save",
-		middleware.SetMiddlewareJson(controller.service.SaveRegister)).Methods("POST")
+		middleware.SetMiddlewareJson(controller.registerServ.SaveRegister)).Methods("POST")
 	controller.router.HandleFunc("/register/update/{id}",
-		middleware.SetMiddlewareJson(controller.service.UpdateRegister)).Methods("PUT")
+		middleware.SetMiddlewareJson(controller.registerServ.UpdateRegister)).Methods("PUT")
+	controller.router.HandleFunc("/register/delete/{id}",
+		middleware.SetMiddlewareJson(controller.registerServ.DeleteRegister)).Methods("DELETE")
+	controller.router.HandleFunc("/register/checkout/{id}",
+		middleware.SetMiddlewareJson(controller.registerServ.UpdateCheckOut)).Methods("PUT")
 }

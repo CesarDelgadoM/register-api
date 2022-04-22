@@ -15,12 +15,12 @@ type Server struct {
 	controller *controller.Controller
 }
 
-func New() *Server {
+func NewServer() *Server {
 	driver := os.Getenv("DB_DRIVER")
 	databases.ConnectDB(driver)
 	return &Server{
 		driver:     driver,
-		controller: controller.New(),
+		controller: controller.NewController(),
 	}
 }
 

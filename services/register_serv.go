@@ -2,12 +2,12 @@ package services
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
 
+	"github.com/CesarDelgadoM/register-API/dto"
 	"github.com/CesarDelgadoM/register-API/models"
 	"github.com/CesarDelgadoM/register-API/repository"
 	"github.com/CesarDelgadoM/register-API/response"
@@ -15,12 +15,12 @@ import (
 )
 
 type RegisterService struct {
-	repo *repository.Repository[models.Register]
+	repo *repository.RegisterRepo
 }
 
-func New() *RegisterService {
+func NewRegisterService() *RegisterService {
 	return &RegisterService{
-		repo: repository.New(models.Register{}),
+		repo: repository.NewRegisterRepo(),
 	}
 }
 
@@ -37,7 +37,7 @@ func (service *RegisterService) SaveRegister(rw http.ResponseWriter, r *http.Req
 		response.Error(rw, http.StatusUnprocessableEntity, err)
 		return
 	}
-	reg, err = service.repo.Save(reg)
+	reg, err = service.repo.SaveOne(reg)
 	if err != nil {
 		response.Error(rw, http.StatusInternalServerError, err)
 		return
@@ -46,13 +46,36 @@ func (service *RegisterService) SaveRegister(rw http.ResponseWriter, r *http.Req
 }
 
 func (service *RegisterService) GetRegister(rw http.ResponseWriter, r *http.Request) {
+	repoObjects := repository.NewRepository(models.Object{})
 	vars := mux.Vars(r)
 	id, err := strconv.ParseUint(vars["id"], 10, 64)
 	if err != nil {
 		response.Error(rw, http.StatusBadRequest, err)
 		return
 	}
-	reg, err := service.repo.GetById("obj_id", uint32(id))
+	reg, err := service.repo.GetById("reg_id", uint32(id))
+	if err != nil {
+		response.Error(rw, http.StatusBadRequest, err)
+		return
+	}
+	obj, err := repoObjects.GetAllById("obj_reg_id", uint32(id))
+	if err != nil {
+		response.Error(rw, http.StatusUnprocessableEntity, err)
+		return
+	}
+	reg.Objects = obj
+	regdto := dto.ModeltoDto(reg)
+	response.Json(rw, http.StatusFound, regdto)
+}
+
+func (service *RegisterService) GetRegisterJoin(rw http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.ParseUint(vars["id"], 10, 64)
+	if err != nil {
+		response.Error(rw, http.StatusBadRequest, err)
+		return
+	}
+	reg, err := service.repo.GetByIdJoin(uint32(id))
 	if err != nil {
 		response.Error(rw, http.StatusBadRequest, err)
 		return
@@ -78,18 +101,53 @@ func (service *RegisterService) UpdateRegister(rw http.ResponseWriter, r *http.R
 		response.Error(rw, http.StatusUnprocessableEntity, err)
 		return
 	}
-	// objs := []models.Object{}
-	// for i, obj := range regup.Objects {
-	// 	objs[i] = obj
-	// }
-	fmt.Println(regup.Objects)
-	regup, err = service.repo.Update("reg_id", uint32(id), regup, map[string]interface{}{
-		"reg_name":       regup.RegName,
-		"reg_company":    regup.RegCompany,
-		"reg_objects_id": regup.Objects,
+	if regup.Objects != nil {
+		repoObjects := repository.NewRepository(models.Object{})
+		repoObjects.Delete("obj_reg_id", uint32(id))
+		for i, obj := range regup.Objects {
+			obj.ObjRegId = uint32(id)
+			regup.Objects[i] = obj
+		}
+		repoObjects.SaveAll(&regup.Objects)
+	}
+	regup, err = service.repo.Update("reg_id", uint32(id), map[string]interface{}{
+		"reg_name":    regup.RegName,
+		"reg_company": regup.RegCompany,
 	})
 	if err != nil {
 		response.Error(rw, http.StatusInternalServerError, err)
 	}
 	response.Json(rw, http.StatusOK, regup)
+}
+
+func (service *RegisterService) UpdateCheckOut(rw http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.ParseUint(vars["id"], 10, 64)
+	if err != nil {
+		response.Error(rw, http.StatusBadRequest, err)
+		return
+	}
+	regup, err := service.repo.Update("reg_id", uint32(id), map[string]interface{}{
+		"reg_check_out": time.Now(),
+	})
+	if err != nil {
+		response.Error(rw, http.StatusInternalServerError, err)
+		return
+	}
+	response.Json(rw, http.StatusOK, regup)
+}
+
+func (service *RegisterService) DeleteRegister(rw http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.ParseUint(vars["id"], 10, 64)
+	if err != nil {
+		response.Error(rw, http.StatusBadRequest, err)
+		return
+	}
+	rows, err := service.repo.Delete("reg_id", uint32(id))
+	if err != nil {
+		response.Error(rw, http.StatusUnprocessableEntity, err)
+		return
+	}
+	response.Json(rw, http.StatusOK, ("deleted rows: " + strconv.Itoa(int(rows))))
 }
