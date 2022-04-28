@@ -7,11 +7,11 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func GetIdUrl(name string, r *http.Request) uint32 {
+func GetIdUrl(name string, r *http.Request) uint64 {
 	vars := mux.Vars(r)
 	id, err := strconv.ParseUint(vars[name], 10, 64)
 	if err != nil {
 		return 0
 	}
-	return uint32(id)
+	return id
 }

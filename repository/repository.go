@@ -42,7 +42,7 @@ func (repo *Repository[T]) GetAll() (*[]T, error) {
 	return model, nil
 }
 
-func (repo *Repository[T]) GetAllById(columnId string, id uint32) ([]T, error) {
+func (repo *Repository[T]) GetAllById(columnId string, id uint64) ([]T, error) {
 	var model []T
 	err := repo.connection.Debug().Model(&model).Where((columnId + " = ?"), id).Limit(100).Find(&model).Error
 	if err != nil {
@@ -51,7 +51,7 @@ func (repo *Repository[T]) GetAllById(columnId string, id uint32) ([]T, error) {
 	return model, nil
 }
 
-func (repo *Repository[T]) GetById(columnId string, id uint32) (*T, error) {
+func (repo *Repository[T]) GetById(columnId string, id uint64) (*T, error) {
 	var model *T
 	err := repo.connection.Debug().Model(&model).Where((columnId + " = ?"), id).Take(&model).Error
 	if err != nil {
@@ -60,7 +60,7 @@ func (repo *Repository[T]) GetById(columnId string, id uint32) (*T, error) {
 	return model, nil
 }
 
-func (repo *Repository[T]) Update(columnId string, id uint32, columns map[string]interface{}) (*T, error) {
+func (repo *Repository[T]) Update(columnId string, id uint64, columns map[string]interface{}) (*T, error) {
 	var model *T
 	err := repo.connection.Debug().Model(&model).Where((columnId + " = ?"), id).Updates(columns).Error
 	if err != nil {
@@ -69,7 +69,7 @@ func (repo *Repository[T]) Update(columnId string, id uint32, columns map[string
 	return model, nil
 }
 
-func (repo *Repository[T]) Delete(columnId string, id uint32) (int64, error) {
+func (repo *Repository[T]) Delete(columnId string, id uint64) (int64, error) {
 	var model *T
 	db := repo.connection.Debug().Model(&model).Where((columnId + " = ?"), id).Delete(&model)
 	if db.Error != nil {

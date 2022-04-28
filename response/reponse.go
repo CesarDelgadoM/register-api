@@ -21,7 +21,8 @@ func Json(w http.ResponseWriter, statusCode int, data interface{}) {
 func Error(w http.ResponseWriter, statusCode int, err error) {
 	if err != nil {
 		Json(w, statusCode, errorf{Error: err.Error()})
-		return
+
+	} else {
+		Json(w, statusCode, nil)
 	}
-	Json(w, statusCode, nil)
 }

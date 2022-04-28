@@ -48,12 +48,12 @@ func (service *RegisterService) SaveRegister(rw http.ResponseWriter, r *http.Req
 func (service *RegisterService) GetRegister(rw http.ResponseWriter, r *http.Request) {
 	repoObjects := repository.NewRepository(models.Object{})
 	id := utils.GetIdUrl("id", r)
-	reg, err := service.repo.GetById("reg_id", uint32(id))
+	reg, err := service.repo.GetById("reg_id", id)
 	if err != nil {
 		response.Error(rw, http.StatusBadRequest, err)
 		return
 	}
-	obj, err := repoObjects.GetAllById("obj_reg_id", uint32(id))
+	obj, err := repoObjects.GetAllById("obj_reg_id", id)
 	if err != nil {
 		response.Error(rw, http.StatusUnprocessableEntity, err)
 		return
@@ -120,14 +120,14 @@ func (service *RegisterService) UpdateRegister(rw http.ResponseWriter, r *http.R
 	}
 	if regup.Objects != nil {
 		repoObjects := repository.NewRepository(models.Object{})
-		repoObjects.Delete("obj_reg_id", uint32(id))
+		repoObjects.Delete("obj_reg_id", id)
 		for i, obj := range regup.Objects {
-			obj.ObjRegId = uint32(id)
+			obj.ObjRegId = id
 			regup.Objects[i] = obj
 		}
 		repoObjects.SaveAll(&regup.Objects)
 	}
-	regup, err = service.repo.Update("reg_id", uint32(id), map[string]interface{}{
+	regup, err = service.repo.Update("reg_id", id, map[string]interface{}{
 		"reg_name":    regup.RegName,
 		"reg_company": regup.RegCompany,
 	})
@@ -139,7 +139,7 @@ func (service *RegisterService) UpdateRegister(rw http.ResponseWriter, r *http.R
 
 func (service *RegisterService) UpdateCheckOut(rw http.ResponseWriter, r *http.Request) {
 	id := utils.GetIdUrl("id", r)
-	regup, err := service.repo.Update("reg_id", uint32(id), map[string]interface{}{
+	regup, err := service.repo.Update("reg_id", id, map[string]interface{}{
 		"reg_check_out": time.Now(),
 	})
 	if err != nil {
@@ -151,7 +151,7 @@ func (service *RegisterService) UpdateCheckOut(rw http.ResponseWriter, r *http.R
 
 func (service *RegisterService) DeleteRegister(rw http.ResponseWriter, r *http.Request) {
 	id := utils.GetIdUrl("id", r)
-	rows, err := service.repo.Delete("reg_id", uint32(id))
+	rows, err := service.repo.Delete("reg_id", id)
 	if err != nil {
 		response.Error(rw, http.StatusUnprocessableEntity, err)
 		return

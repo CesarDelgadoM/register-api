@@ -7,7 +7,7 @@ import (
 )
 
 type RegisterDTO struct {
-	RegId       uint32      `json:"reg_id"`
+	RegId       uint64      `json:"reg_id"`
 	RegName     string      `json:"reg_name"`
 	RegCompany  string      `json:"reg_company"`
 	RegCheckIn  time.Time   `json:"reg_check_in"`
